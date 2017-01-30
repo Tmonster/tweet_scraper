@@ -13,7 +13,7 @@ def main():
         username = sys.argv[1]
         amount = int(sys.argv[2])
     else:
-      print "Usage: python trumTweets.py username amount [filename]"
+      print "Usage: python getTweets.py username amount [filename]"
       sys.exit(1)
     # Fill in the values noted in previous step here
     cfg = {
@@ -24,11 +24,11 @@ def main():
     }
 
     api = get_api(cfg)
-    user = api.get_user("realDonaldTrump")
+    user = api.get_user(username)
     if sys.argv[3]:
-      tweet_dumper.get_all_tweets(username, api, amount, sys.argv[3]+".txt")
+      tweet_dumper.get_all_tweets4args(username, api, amount, sys.argv[3])
     else:
-      tweet_dumper.get_all_tweets(username, api, amount)
+      tweet_dumper.get_all_tweets3args(username, api, amount)
 
 if __name__ == "__main__":
   main()
