@@ -1,4 +1,3 @@
-
 import tweepy #https://github.com/tweepy/tweepy
 import sys
 import os
@@ -7,6 +6,9 @@ import re
 def updateLastTweet(filename, screen_name, newLastTweet):
     tmpLine = ""
     newData = ""
+    if not os.path.isfile(filename):
+        newFile = open(filename, 'w')
+        newFile.close()
     with open(filename, 'r+b') as f:
         for line in f:
             tmpLine = line.split(':')
@@ -21,6 +23,9 @@ def updateLastTweet(filename, screen_name, newLastTweet):
     os.rename(filename + ".swp", filename)
 
 def getMostRecentTweet(filename, screen_name):
+    if not os.path.isfile(filename):
+        newFile = open(filename, 'w')
+        newFile.close()
     with open(filename, 'r+b') as f:
         for line in f:
             tmpLine = line.split(":")
