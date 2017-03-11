@@ -2,6 +2,19 @@ import tweepy
 import tweet_dumper
 import sys
 import re
+import json
+
+# looks for json file with the proper credentials for the user
+# {
+# "consumer_key"        : "value",
+# "consumer_secret"     : "value",
+# "access_token"        : "value",
+# "access_token_secret" : "value"
+# }
+def get_credentials(filename):
+    with open(filename) as file:
+        cfg = json.load(file)
+    return cfg
 
 def get_api(cfg):
     auth = tweepy.OAuthHandler(cfg['consumer_key'], cfg['consumer_secret'])
@@ -9,20 +22,14 @@ def get_api(cfg):
     return tweepy.API(auth)
 
 def main():
-    if sys.argv[1] and sys.argv[2]:
+    try:
         username = sys.argv[1]
         amount = int(sys.argv[2])
-    else:
+    except IndexError as e:
       print "Usage: python getTweets.py username amount [filename]"
       sys.exit(1)
     # Fill in the values noted in previous step here
-    cfg = {
-    "consumer_key"        : "Ximk8dlrGGejLqL65TO39SqMD",
-    "consumer_secret"     : "SiwVIoNUygs8FdZRAb4D3n6IdQUYPfUG82UNu2OwWUFhO9fq0l",
-    "access_token"        : "705285627-hsGmup5zp84eZ6BPCqjmAWaR3g2YOXad3gPBnUac",
-    "access_token_secret" : "Z6ws8O78em89H4ErpD5O2A0UM90t7hBXLxXRVH2Rson6V"
-    }
-
+    cfg = get_credentials("the_Tmonster.json")
     api = get_api(cfg)
     user = api.get_user(username)
     if sys.argv[3]:
@@ -31,4 +38,4 @@ def main():
       tweet_dumper.get_all_tweets3args(username, api, amount)
 
 if __name__ == "__main__":
-  main()
+    main()

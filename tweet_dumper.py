@@ -49,24 +49,33 @@ def get_all_tweets4args(screen_name, api, amount, filename):
     get_all_tweets5args(screen_name, api, amount, filename, lastTweetId)
 
 
-def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile):
-	#Twitter only allows access to a users most recent 3240 tweets with this method
+def writeTweets(filename, mode, tweets):
+    f = open(filename, mode)
+    # print len(alltweets)
+    for tweet in tweets:
+        if tweet != "\n" or tweet != "":
+            f.write(tweet)
+            f.write("\n")
+    f.close()
 
-	#initialize a list to hold all the tweepy Tweets
+def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile):
+    #Twitter only allows access to a users most recent 3240 tweets with this method
+    #initialize a list to hold all the tweepy Tweets
     alltweets = []
-    
-	# make request for most recent tweets (200 is the maximum allowed count)
+
+    # make request for most recent tweets (200 is the maximum allowed count)
     new_tweets = api.user_timeline(screen_name = screen_name,count=200, include_rts = True)
     numTweets = len(new_tweets)
     MostRecentTweetPulled = getMostRecentTweet(lastTweetScrapedFile, screen_name)
     print "Most Recent Tweet Pulled =", MostRecentTweetPulled
-    
-    # record most recent tweet obtained
+
+    # record most recent tweet id.
+    # The id of the last tweet the user tweeted.
     if len(new_tweets) > 0:
         most_recent_tweet = new_tweets[0].id
     else:
         most_recent_tweet = 0
-    # loop over first request and keep requesting until amount 
+    # loop over first request and keep requesting until amount
     # is reached or the 3240 threshold is reached
     while len(new_tweets) > 0:
         for tweet in new_tweets:
@@ -100,19 +109,10 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
         new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
         if numTweets >= amount:
             break
-        numTweets += len(new_tweets) 
+        numTweets += len(new_tweets)
 
+    writeTweets(filename, 'a', alltweets)
     # write to txt file
-    f = open(filename, 'a')
-    # print len(alltweets)
-    numbs = 0
-    for tweet in alltweets:
-        if tweet != "\n":
-            f.write(tweet)
-            f.write("\n")
-        numbs += 1
-    f.close()
-
     updateLastTweet(lastTweetScrapedFile, screen_name, most_recent_tweet)
 
 
