@@ -4,10 +4,6 @@ import filecmp
 import tweet_dumper
 import json
 
-# For twitter account @TestsssTom
-# Password to account is "saymanyougottajoint"
-# key management
-# https://apps.twitter.com/app/13524605/keys
 
 # looks for json file with the proper credentials for the user
 # {
