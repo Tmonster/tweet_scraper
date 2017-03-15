@@ -3,6 +3,9 @@ import sys
 import os
 import re
 
+
+# update the id of the lasttweet stored in the given filename
+# if the file doesn't exist, one is created
 def updateLastTweet(filename, screen_name, newLastTweet):
     tmpLine = ""
     newData = ""
@@ -22,6 +25,8 @@ def updateLastTweet(filename, screen_name, newLastTweet):
     os.remove(filename)
     os.rename(filename + ".swp", filename)
 
+# get the id of the most recent tweet recorded from the file
+# specified by filename
 def getMostRecentTweet(filename, screen_name):
     if not os.path.isfile(filename):
         newFile = open(filename, 'w')
@@ -59,11 +64,12 @@ def writeTweets(filename, mode, tweets):
     f.close()
 
 def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile):
-    #Twitter only allows access to a users most recent 3240 tweets with this method
     #initialize a list to hold all the tweepy Tweets
     alltweets = []
 
-    # make request for most recent tweets (200 is the maximum allowed count)
+    # make request for most recent tweets
+    # you can only pull 200 tweets from twitter at a time,
+    # hence count=200
     new_tweets = api.user_timeline(screen_name = screen_name,count=200, include_rts = True)
     numTweets = len(new_tweets)
     MostRecentTweetPulled = getMostRecentTweet(lastTweetScrapedFile, screen_name)
@@ -72,6 +78,8 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
     # record most recent tweet id.
     # The id of the last tweet the user tweeted.
     if len(new_tweets) > 0:
+        # most recent tweet will replace MostRecentTweetPulled 
+        # after all new tweets are scraped
         most_recent_tweet = new_tweets[0].id
     else:
         most_recent_tweet = 0
@@ -79,6 +87,7 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
     # is reached or the 3240 threshold is reached
     while len(new_tweets) > 0:
         for tweet in new_tweets:
+            # break if you see the id of a tweet you have scraped
             if int(MostRecentTweetPulled) >= int(tweet.id):
                 print "Most Recent Tweet Pulled =", MostRecentTweetPulled
                 print "tweet.id = ", tweet.id
@@ -95,7 +104,7 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
                         strippedTweet+=character
                 tweet = strippedTweet
             # strip URLS, Ampersands, retweets, and newlines
-            tweet = re.sub(r'(?:www|https?)[^\s]+', '', tweet, flags=re.MULTILINE)
+            tweet = re.sub(r'(?:www|https?)[^\s]+\s', '', tweet, flags=re.MULTILINE)
             tweet = re.sub(r'&amp;', '&', tweet, flags=re.MULTILINE)
             tweet = re.sub(r'^RT.*:+ ', '', tweet, flags=re.MULTILINE)
             tweet = tweet.replace('\n', ' ')
