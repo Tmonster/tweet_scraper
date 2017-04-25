@@ -123,5 +123,3 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
     writeTweets(filename, 'a', alltweets)
     # write to txt file
     updateLastTweet(lastTweetScrapedFile, screen_name, most_recent_tweet)
-
-

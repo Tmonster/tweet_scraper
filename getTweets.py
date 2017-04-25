@@ -32,9 +32,9 @@ def main():
     cfg = get_credentials("the_Tmonster.json")
     api = get_api(cfg)
     user = api.get_user(username)
-    if sys.argv[3]:
+    try:
       tweet_dumper.get_all_tweets4args(username, api, amount, sys.argv[3])
-    else:
+    except IndexError as e:
       tweet_dumper.get_all_tweets3args(username, api, amount)
 
 if __name__ == "__main__":
