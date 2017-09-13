@@ -5,3 +5,5 @@
 *.json
 *.ignore
 tweet.py
+saved_tweets/*
+authentication_files/*

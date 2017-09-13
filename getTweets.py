@@ -11,6 +11,7 @@ import json
 # "access_token"        : "value",
 # "access_token_secret" : "value"
 # }
+
 def get_credentials(filename):
     with open(filename) as file:
         cfg = json.load(file)
@@ -23,19 +24,39 @@ def get_api(cfg):
 
 def main():
     try:
-        username = sys.argv[1]
-        amount = int(sys.argv[2])
+        users = 1
+        usernames = []
+        amount = 0
+        place_in_named_file = False
+        for i in range(len(sys.argv)):
+            try:
+                # if I can cast to integer, interpret
+                # as amount
+                amount = int(sys.argv[users])
+                break;
+            except:
+                # otherwise, interpret as twitterhandle
+                usernames.append(sys.argv[users])
+                users+=1
+        if sys.argv[-2] == "-f":
+            named_file = sys.argv[-1]
+            place_in_named_file = True
+        if len(usernames) == 0 or amount == 0:
+            raise IndexError
     except IndexError as e:
-      print "Usage: python getTweets.py username amount [filename]"
+      print "Usage: python getTweets.py username [username...] amount [-f filename]"
       sys.exit(1)
+
     # Fill in the values noted in previous step here
-    cfg = get_credentials("the_Tmonster.json")
+    cfg = get_credentials("./authentication_files/the_Tmonster.json")
     api = get_api(cfg)
-    user = api.get_user(username)
-    try:
-      tweet_dumper.get_all_tweets4args(username, api, amount, sys.argv[3])
-    except IndexError as e:
-      tweet_dumper.get_all_tweets3args(username, api, amount)
+
+    for handle in usernames:
+        user = api.get_user(handle)
+        if place_in_named_file:
+            tweet_dumper.get_all_tweets4args(handle, api, amount, named_file)
+        else:
+            tweet_dumper.get_all_tweets3args(handle, api, amount)
 
 if __name__ == "__main__":
     main()

@@ -55,8 +55,18 @@ def get_all_tweets4args(screen_name, api, amount, filename):
 
 
 def writeTweets(filename, mode, tweets):
-    f = open(filename, mode)
-    # print len(alltweets)
+    if filename.find("saved_tweets") == -1:
+        if os.path.isdir("./saved_tweets"):
+            f = open("./saved_tweets/" + filename, mode)
+        else:
+            os.makedirs("./saved_tweets")
+            f = open("./saved_tweets/" + filename, mode)
+    elif os.path.isdir("./saved_tweets"):
+        f = open(filename, mode)
+    else:
+        os.makedirs("./saved_tweets")
+        f = open(filename, mode)
+
     for tweet in tweets:
         if tweet != "\n" or tweet != "":
             f.write(tweet)
@@ -73,7 +83,7 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
     new_tweets = api.user_timeline(screen_name = screen_name,count=200, include_rts = True)
     numTweets = len(new_tweets)
     MostRecentTweetPulled = getMostRecentTweet(lastTweetScrapedFile, screen_name)
-    print "Most Recent Tweet Pulled =", MostRecentTweetPulled
+    print "Most Recent Tweet ID Pulled for", screen_name, "=", MostRecentTweetPulled
 
     # record most recent tweet id.
     # The id of the last tweet the user tweeted.
@@ -104,7 +114,7 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
                         strippedTweet+=character
                 tweet = strippedTweet
             # strip URLS, Ampersands, retweets, and newlines
-            tweet = re.sub(r'(?:www|https?)[^\s]+\s', '', tweet, flags=re.MULTILINE)
+            tweet = re.sub(r'(www|https?)[^\s]+', '', tweet)
             tweet = re.sub(r'&amp;', '&', tweet, flags=re.MULTILINE)
             tweet = re.sub(r'^RT.*:+ ', '', tweet, flags=re.MULTILINE)
             tweet = tweet.replace('\n', ' ')
@@ -121,5 +131,5 @@ def get_all_tweets5args(screen_name, api, amount, filename, lastTweetScrapedFile
         numTweets += len(new_tweets)
 
     writeTweets(filename, 'a', alltweets)
-    # write to txt file
+    # update Last Tweet
     updateLastTweet(lastTweetScrapedFile, screen_name, most_recent_tweet)
